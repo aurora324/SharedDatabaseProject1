@@ -2,9 +2,7 @@ import java.io.*;
 import java.util.regex.Pattern;
 
 public class Generation {
-
     public static void main(String[] args) throws IOException {
-
         long start = System.currentTimeMillis();
         //users();
 //        danmu();
