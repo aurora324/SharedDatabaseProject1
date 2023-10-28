@@ -9,8 +9,6 @@ public class Main {
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
         } catch (IOException e) {
-
-
             throw new RuntimeException(e);
         }
     }

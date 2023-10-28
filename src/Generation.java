@@ -157,7 +157,7 @@ public class Generation {
             String add = bufferedReader.readLine();
             while (!add.equals("122879,敖厂长,保密,,6,,[],user")) {
                 if (add.equals("")) {
-                    add = " ";
+                    add = "\\n";
                 }
                 fileWriter.write(add);
                 if (add.endsWith("user")) {
