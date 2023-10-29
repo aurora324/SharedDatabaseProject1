@@ -45,7 +45,7 @@ public class Generation {
     public static void users() throws IOException {
         addUsers();
         File inputFile = new File("src/addUsers.csv");
-        File outputFile = new File("src/users.sql");
+        File outputFile = new File("E:/Datagrip/代码/cs307/users.sql");
         if (outputFile.exists()) {
             if (outputFile.delete()) {
                 System.out.println("delete");

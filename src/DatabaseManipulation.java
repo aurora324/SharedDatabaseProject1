@@ -2,7 +2,7 @@ import java.io.*;
 import java.sql.*;
 
 public class DatabaseManipulation implements DataManipulation {
-    private Connection con=null;
+    private Connection con = null;
     private ResultSet resultSet;
 
     private String host = "localhost";
@@ -41,17 +41,17 @@ public class DatabaseManipulation implements DataManipulation {
     }
 
     public void addUsers() throws IOException {
-        changeUsers();
-        int result=0;
-        long start=System.currentTimeMillis();
+        users();
+        int result = 0;
+        long start = System.currentTimeMillis();
         getConnection();
         File inputFile = new File("src/addUsers.csv");
         String sql = "insert into users (Mid,Name,Sex,Birthday,Level,Sign,following,identity) values (?,?,?,?,?,?,?,?);";
-        String add=null;
+        String add = null;
         try (FileReader fileReader = new FileReader(inputFile);
              BufferedReader bufferedReader = new BufferedReader(fileReader)) {
             bufferedReader.readLine();
-            while (( add= bufferedReader.readLine()) != null) {
+            while ((add = bufferedReader.readLine()) != null) {
                 add = add.replace('\'', ' ');
                 add = add.replace('[', '{');
                 add = add.replace(']', '}');
@@ -77,41 +77,41 @@ public class DatabaseManipulation implements DataManipulation {
                     }
                 }
                 //mid
-                String s1= (arr[0]);
+                String s1 = (arr[0]);
                 //name
-                StringBuilder s2= new StringBuilder();
+                StringBuilder s2 = new StringBuilder();
                 for (int i = 1; i <= indexOfSex - 1; i++) {
                     s2.append(arr[i]);
                 }
                 //sex
-                StringBuilder s3=new StringBuilder();
+                StringBuilder s3 = new StringBuilder();
                 s3.append(arr[indexOfSex]);
                 //birth
-                StringBuilder s4=new StringBuilder();
-                s4.append(arr[indexOfSex+1]);
+                StringBuilder s4 = new StringBuilder();
+                s4.append(arr[indexOfSex + 1]);
                 //level
-                StringBuilder s5=new StringBuilder();
+                StringBuilder s5 = new StringBuilder();
                 s5.append(arr[indexOfSex + 2]);
                 //sign
-                StringBuilder s6=new StringBuilder();
+                StringBuilder s6 = new StringBuilder();
                 for (int i = indexOfSex + 3; i < index1; i++) {
                     s6.append(arr[i]);
                 }
                 //following
-                Long[]copy=new Long[index2-index1];
-                for (int i = index1,j=0; i < index2; i++,j++) {
-                    arr[i]=arr[i].replace('{',' ');
-                    arr[i]=arr[i].replace('}',' ');
+                Long[] copy = new Long[index2 - index1];
+                for (int i = index1, j = 0; i < index2; i++, j++) {
+                    arr[i] = arr[i].replace('{', ' ');
+                    arr[i] = arr[i].replace('}', ' ');
                     arr[i] = arr[i].trim();
-                    copy[j]= Long.valueOf(arr[i]);
+                    copy[j] = Long.valueOf(arr[i]);
                 }
                 //identity
-                StringBuilder s8=new StringBuilder().append(arr[arr.length - 1]);
+                StringBuilder s8 = new StringBuilder().append(arr[arr.length - 1]);
                 try {
                     PreparedStatement preparedStatement = con.prepareStatement(sql);
                     preparedStatement.setLong(1, Long.parseLong(s1));
                     preparedStatement.setString(2, String.valueOf(s2));
-                    preparedStatement.setString(3,String.valueOf(s3));
+                    preparedStatement.setString(3, String.valueOf(s3));
                     preparedStatement.setString(4, String.valueOf(s4));
                     preparedStatement.setInt(5, Integer.parseInt(String.valueOf(s5)));
                     preparedStatement.setString(6, String.valueOf(s6));
@@ -128,11 +128,11 @@ public class DatabaseManipulation implements DataManipulation {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        long end=System.currentTimeMillis();
-        System.out.println("users插入时间为："+(end-start));
+        long end = System.currentTimeMillis();
+        System.out.println("users插入时间为：" + (end - start));
     }
 
-    public static void changeUsers() throws IOException {
+    public static void users() throws IOException {
         File inputFile = new File("src/users.csv");
         File outputFile = new File("src/addUsers.csv");
         if (outputFile.exists()) {
