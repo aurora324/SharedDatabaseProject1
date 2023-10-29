@@ -1,10 +1,10 @@
 import java.io.IOException;
 
 public interface DataManipulation {
-
-
     public void addUsers() throws IOException;
-    public void addFollow();
+    public void addFollow()throws IOException;
+    public void addFollower()throws IOException;
+    public void addVideos()throws  IOException;
     public String allContinentNames();
     public String continentsWithCountryCount();
     public String FullInformationOfMoviesRuntime(int min, int max);
