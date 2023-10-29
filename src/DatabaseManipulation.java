@@ -46,11 +46,20 @@ public class DatabaseManipulation implements DataManipulation {
         long start = System.currentTimeMillis();
         getConnection();
         File inputFile = new File("src/addUsers.csv");
-        String sql = "insert into users (Mid,Name,Sex,Birthday,Level,Sign,following,identity) values (?,?,?,?,?,?,?,?);";
+        File outputFile = new File("src/addFollow.csv");
+        if (outputFile.exists()) {
+            if (outputFile.delete()) {
+                System.out.println("delete");
+            }
+            if (outputFile.createNewFile()) {
+                System.out.println("new file");
+            }
+        }
+        FileWriter filewriter = new FileWriter(outputFile);
+        String sql = "insert into users (Mid,Name,Sex,Birthday,Level,Sign,identity) values (?,?,?,?,?,?,?);";
         String add = null;
         try (FileReader fileReader = new FileReader(inputFile);
              BufferedReader bufferedReader = new BufferedReader(fileReader)) {
-            bufferedReader.readLine();
             while ((add = bufferedReader.readLine()) != null) {
                 add = add.replace('\'', ' ');
                 add = add.replace('[', '{');
@@ -98,35 +107,48 @@ public class DatabaseManipulation implements DataManipulation {
                     s6.append(arr[i]);
                 }
                 //following
-                Long[] copy = new Long[index2 - index1];
+                String[] copy = new String[index2 - index1];
                 for (int i = index1, j = 0; i < index2; i++, j++) {
                     arr[i] = arr[i].replace('{', ' ');
                     arr[i] = arr[i].replace('}', ' ');
                     arr[i] = arr[i].trim();
-                    copy[j] = Long.valueOf(arr[i]);
+                    copy[j] = arr[i];
                 }
                 //identity
                 StringBuilder s8 = new StringBuilder().append(arr[arr.length - 1]);
                 try {
                     PreparedStatement preparedStatement = con.prepareStatement(sql);
-                    preparedStatement.setLong(1, Long.parseLong(s1));
+                    preparedStatement.setString(1, s1);
                     preparedStatement.setString(2, String.valueOf(s2));
                     preparedStatement.setString(3, String.valueOf(s3));
                     preparedStatement.setString(4, String.valueOf(s4));
                     preparedStatement.setInt(5, Integer.parseInt(String.valueOf(s5)));
                     preparedStatement.setString(6, String.valueOf(s6));
-                    Array array = con.createArrayOf("BIGINT", copy);
-                    preparedStatement.setArray(7, array);
-                    preparedStatement.setString(8, String.valueOf(s8));
+//                    Array array = con.createArrayOf("Varchar", copy);
+//                    preparedStatement.setArray(7, array);
+                    preparedStatement.setString(7, String.valueOf(s8));
                     //System.out.println(preparedStatement);
                     result = preparedStatement.executeUpdate();
                 } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    filewriter.write(s1 + "\n");
+                    for (String s : copy) {
+                        filewriter.write(s + " ");
+                    }
+                    filewriter.write(" \n");
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            filewriter.flush();
+            filewriter.close();
         }
         long end = System.currentTimeMillis();
         System.out.println("users插入时间为：" + (end - start));
@@ -144,8 +166,7 @@ public class DatabaseManipulation implements DataManipulation {
             }
         }
         FileWriter fileWriter = new FileWriter(outputFile);
-        try (FileReader fileReader = new FileReader(inputFile);
-             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+        try (FileReader fileReader = new FileReader(inputFile); BufferedReader bufferedReader = new BufferedReader(fileReader)) {
             System.out.println("first write");
             bufferedReader.readLine();
             String add = bufferedReader.readLine();
@@ -167,6 +188,13 @@ public class DatabaseManipulation implements DataManipulation {
             fileWriter.flush();
             fileWriter.close();
         }
+    }
+
+    public void addFollow() {
+        getConnection();
+        File inputFile = new File("src/addUsers.csv");
+        String sql = "insert into users (Mid,Name,Sex,Birthday,Level,Sign,following,identity) values (?,?,?,?,?,?,?,?);";
+        String add = null;
     }
 
     public String allContinentNames() {
