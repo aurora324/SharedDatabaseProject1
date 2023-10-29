@@ -4,6 +4,7 @@ public interface DataManipulation {
 
 
     public void addUsers() throws IOException;
+    public void addFollow();
     public String allContinentNames();
     public String continentsWithCountryCount();
     public String FullInformationOfMoviesRuntime(int min, int max);

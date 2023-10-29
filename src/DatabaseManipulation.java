@@ -1,10 +1,14 @@
 import java.io.*;
 import java.sql.*;
+import java.util.Arrays;
 
 public class DatabaseManipulation implements DataManipulation {
     private Connection con = null;
     private ResultSet resultSet;
-
+    static String[] users = new String[37881];
+    static String[] id=new String[37881];
+    static String[][] follow = new String[37881][];
+    static String[] followToString = new String[37881];
     private String host = "localhost";
     private String dbname = "数据库";
     private String user = "postgres";
@@ -56,8 +60,10 @@ public class DatabaseManipulation implements DataManipulation {
             }
         }
         FileWriter filewriter = new FileWriter(outputFile);
-        String sql = "insert into users (Mid,Name,Sex,Birthday,Level,Sign,identity) values (?,?,?,?,?,?,?);";
+        String sql1 = "insert into users (Mid,Name,Sex,Birthday,Level,Sign,identity) values (?,?,?,?,?,?,?);";
+        String sql2 = "insert into Follow (follow_id, follower_mid, following_mid) values (?,?,?);";
         String add = null;
+        int counter = 0;
         try (FileReader fileReader = new FileReader(inputFile);
              BufferedReader bufferedReader = new BufferedReader(fileReader)) {
             while ((add = bufferedReader.readLine()) != null) {
@@ -65,6 +71,7 @@ public class DatabaseManipulation implements DataManipulation {
                 add = add.replace('[', '{');
                 add = add.replace(']', '}');
                 add = add.replace('"', ' ');
+                add = add.trim();
                 int indexOfSex = 0;
                 int index1 = 0;
                 int index2 = 0;
@@ -114,10 +121,11 @@ public class DatabaseManipulation implements DataManipulation {
                     arr[i] = arr[i].trim();
                     copy[j] = arr[i];
                 }
+
                 //identity
                 StringBuilder s8 = new StringBuilder().append(arr[arr.length - 1]);
                 try {
-                    PreparedStatement preparedStatement = con.prepareStatement(sql);
+                    PreparedStatement preparedStatement = con.prepareStatement(sql1);
                     preparedStatement.setString(1, s1);
                     preparedStatement.setString(2, String.valueOf(s2));
                     preparedStatement.setString(3, String.valueOf(s3));
@@ -133,17 +141,40 @@ public class DatabaseManipulation implements DataManipulation {
                     e.printStackTrace();
                 }
 
-                try {
-                    filewriter.write(s1 + "\n");
-                    for (String s : copy) {
-                        filewriter.write(s + " ");
-                    }
-                    filewriter.write(" \n");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    PreparedStatement preparedStatement = con.prepareStatement(sql2);
+//                    preparedStatement.setString(1, s1);
+//                    preparedStatement.setString(2, String.valueOf(s2));
+//                    Array array = con.createArrayOf("Varchar", copy);
+//                    preparedStatement.setArray(3, array);
+//                    result = preparedStatement.executeUpdate();
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                }
+
+
+                follow[counter] = copy;
+                followToString[counter] = Arrays.toString(copy);
+                users[counter] = s1;
+                counter++;
+//                try {
+//                    for (String s : copy) {
+//                        filewriter.write(s + " ");
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
             }
             closeConnection();
+            for (int i = 0; i < 37881; i++) {
+                filewriter.write(users[i] + "\n");
+                for (int j = 0; j < followToString.length; j++) {
+                    if (followToString[j].contains(users[i])) {
+                        filewriter.write(users[j] + " ");
+                    }
+                }
+                filewriter.write("\n");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -191,10 +222,147 @@ public class DatabaseManipulation implements DataManipulation {
     }
 
     public void addFollow() {
+        long start = System.currentTimeMillis();
         getConnection();
-        File inputFile = new File("src/addUsers.csv");
-        String sql = "insert into users (Mid,Name,Sex,Birthday,Level,Sign,following,identity) values (?,?,?,?,?,?,?,?);";
+        File inputFile = new File("src/addFollow.csv");
+        String sql = "insert into Follow (follow_id, follower_mid, following_mid) values (?,?,?);";
+        try (FileReader fileReader = new FileReader(inputFile); BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+            int counter = 0;
+            String s = null;
+            while ((s = bufferedReader.readLine()) != null) {
+                try {
+                    PreparedStatement preparedStatement = con.prepareStatement(sql);
+                    preparedStatement.setString(1, s);
+                    s = bufferedReader.readLine();
+                    String[] follower_mid = s.split(" ");
+                    Array array2 = con.createArrayOf("Varchar", follower_mid);
+                    preparedStatement.setArray(2, array2);
+                    Array array3 = con.createArrayOf("Varchar", follow[counter]);
+                    preparedStatement.setArray(3, array3);
+                    preparedStatement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(sql);
+                counter++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Follow输入时间为" + (end - start));
+    }
+
+    public void danmu() throws IOException {
+        int result = 0;
+        long start = System.currentTimeMillis();
+        getConnection();
+        File inputFile = new File("src/danmu.csv");
+        File outputFile = new File("src/adddammu.csv");
+        if (outputFile.exists()) {
+            if (outputFile.delete()) {
+                System.out.println("delete");
+            }
+            if (outputFile.createNewFile()) {
+                System.out.println("new file");
+            }
+        }
+        FileWriter filewriter = new FileWriter(outputFile);
+        String sql = "insert into danmu (BV,user_mid,time,content) values (?,?,?,?);";
         String add = null;
+        try (FileReader fileReader = new FileReader(inputFile);
+             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+            while ((add = bufferedReader.readLine()) != null) {
+                add = add.replace('\'', ' ');
+                add = add.replace('[', '{');
+                add = add.replace(']', '}');
+                add = add.replace('"', ' ');
+                int indexOfSex = 0;
+                int index1 = 0;
+                int index2 = 0;
+                String[] arr = add.split(",");
+                if(arr.length==1 ||arr.length==3){
+                    System.out.println(arr.length);
+                    System.out.println(Arrays.toString(arr));
+                    continue;
+                }
+//                for (int i = 0; i < arr.length; i++) {
+//                    if (arr[i].equals("男") || arr[i].equals("女") || arr[i].equals("保密")) {
+//                        indexOfSex = i;
+//                        break;
+//                    }
+//                }
+//                for (int i = 0; i < arr.length; i++) {
+//                    if (arr[i].contains("{")) {
+//                        index1 = i;
+//                    }
+//                }
+//                for (int i = 0; i < arr.length; i++) {
+//                    if (arr[i].contains("}")) {
+//                        index2 = i;
+//                    }
+//                }
+                //BV
+                String s1 = (arr[0]);
+                //mid
+                String s2 = (arr[1]);
+                //user_mid
+                String s3 = (arr[2]);
+                //time
+                String s4 = (arr[3]);
+                //content
+                StringBuilder s5 = new StringBuilder();
+                for (int i = 4; i < arr.length-1; i++) {
+                    s5.append(arr[i]).append(",");
+                }
+                s5.append(arr[arr.length-1]);
+//                //following
+//                String[] copy = new String[index2 - index1];
+//                for (int i = index1, j = 0; i < index2; i++, j++) {
+//                    arr[i] = arr[i].replace('{', ' ');
+//                    arr[i] = arr[i].replace('}', ' ');
+//                    arr[i] = arr[i].trim();
+//                    copy[j] = arr[i];
+//                }
+//                //identity
+//                StringBuilder s8 = new StringBuilder().append(arr[arr.length - 1]);
+
+                try {
+                    PreparedStatement preparedStatement = con.prepareStatement(sql);
+                    preparedStatement.setString(1, String.valueOf(s1));
+                    preparedStatement.setString(2, String.valueOf(s2));
+                    preparedStatement.setString(3, String.valueOf(s3));
+                    preparedStatement.setString(4, String.valueOf(s4));
+//                    preparedStatement.setString(5, String.valueOf(s5));
+//                    Array array = con.createArrayOf("Varchar", copy);
+//                    preparedStatement.setArray(7, array);
+//                    System.out.println(preparedStatement);
+                    result = preparedStatement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    filewriter.write(s1 + "\n");
+//                    for (String s : copy) {
+//                        filewriter.write(s + " ");
+//                    }
+                    filewriter.write(" \n");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            closeConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            filewriter.flush();
+            filewriter.close();
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("danmu插入时间为：" + (end - start));
     }
 
     public String allContinentNames() {
@@ -205,7 +373,7 @@ public class DatabaseManipulation implements DataManipulation {
             Statement statement = con.createStatement();
             resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
-                sb.append(resultSet.getString("continent") + "\n");
+                sb.append(resultSet.getString("continent")).append("\n");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -295,5 +463,15 @@ public class DatabaseManipulation implements DataManipulation {
             closeConnection(); // close connection
         }
         return null;
+    }
+
+    public static int countOccurrences(String str, char ch) {
+        int count = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == ch) {
+                count++;
+            }
+        }
+        return count;
     }
 }

@@ -5,11 +5,13 @@ public class Main {
         DataManipulation dm = null;
         try {
             dm = new DataFactory().createDataManipulation("database");
-            dm.addUsers();
+            //dm.addUsers();
+           dm.addFollow();
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            }
+//        catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }
