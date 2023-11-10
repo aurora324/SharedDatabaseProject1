@@ -1373,31 +1373,27 @@ statement.executeBatch();
     public void update(){
         getConnection();
         long count=0;
-        long start = 0;
+        long start = System.currentTimeMillis();;
         try  {
             DatabaseMetaData metaData = con.getMetaData();
             ResultSet columns = metaData.getColumns(null, null, "users", null);
 
             while (columns.next()) {
-                String columnName = columns.getString("sign");
-                boolean isNullable = columns.getBoolean("NULLABLE");
+                String updateQuery = "UPDATE users SET sign = '0' WHERE sign ='';";
 
-                if (isNullable) {
-                    String updateQuery = "UPDATE users SET sign = 0 WHERE sign IS NULL";
-
-                    try (PreparedStatement statement = con.prepareStatement(updateQuery)) {
-                        statement.executeUpdate();
-                        count++;
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                try (PreparedStatement statement = con.prepareStatement(updateQuery)) {
+                    statement.executeUpdate();
+                    count++;
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         long end = System.currentTimeMillis();
-        System.out.println("update"+count+"条数据时间为：" + (end - start));
+        System.out.println("update "+count+"条数据时间为：" + (end - start));
     }
 
     public String allContinentNames() {
