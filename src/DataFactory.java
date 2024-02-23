@@ -12,7 +12,8 @@ public class DataFactory {
         }
         try {
             return (DataManipulation) Class.forName(name).getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                 ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;

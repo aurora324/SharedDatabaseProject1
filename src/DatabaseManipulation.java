@@ -20,18 +20,20 @@ public class DatabaseManipulation implements DataManipulation {
     static String[][] follow = new String[37881][];
     static String[] followToString = new String[37881];
     //wbq
-//    private String host = "localhost";
-//    private String dbname = "数据库";
-//    private String user = "postgres";
-//    private String pwd = "000000";
-//    private String port = "5432";
+    private String host = "localhost";
+    private String dbname = "temp";
+    private String user = "postgres";
+    private String pwd = "000000";
+    private String port = "5432";
+
     //hyf
-    private final String host = "localhost";//"192.168.1.3";
-//    private final String dbname = "postgres";
-        private String dbname = "project 1";
-    private final String user = "test";
-    private final String pwd = "123456";
-    private final String port = "5432";
+//    private final String host = "localhost";//"192.168.1.3";
+//    //    private final String dbname = "postgres";
+//    private String dbname = "project 1";
+//    private final String user = "test";
+//    private final String pwd = "123456";
+//    private final String port = "5432";
+
     private Connection con = null;
     private ResultSet resultSet;
 
@@ -69,16 +71,6 @@ public class DatabaseManipulation implements DataManipulation {
             fileWriter.flush();
             fileWriter.close();
         }
-    }
-
-    public static int countOccurrences(String str, char ch) {
-        int count = 0;
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) == ch) {
-                count++;
-            }
-        }
-        return count;
     }
 
     private void getConnection() {
@@ -424,17 +416,6 @@ public class DatabaseManipulation implements DataManipulation {
         long start = System.currentTimeMillis();
         getConnection();
         File inputFile = new File("src/addUsers.csv");
-//        File outputFile = new File("src/addFollow.csv");
-//        if (outputFile.exists()) {
-//            if (outputFile.delete()) {
-//                System.out.println("delete");
-//            }
-//            if (outputFile.createNewFile()) {
-//                System.out.println("new file");
-//            }
-//        }
-//        FileWriter filewriter = new FileWriter(outputFile);
-//        String sql1 = "insert into users (Mid,Name,Sex,Birthday,Level,Sign,identity) values (?,?,?,?,?,?,?);";
         String sql2 = "insert into Follow (follower_mid, following_mid) values (?,?);";
         String add = null;
         int counter = 0;
@@ -498,23 +479,6 @@ public class DatabaseManipulation implements DataManipulation {
 
                 //identity
                 StringBuilder s8 = new StringBuilder().append(arr[arr.length - 1]);
-//                try {
-//                    PreparedStatement preparedStatement = con.prepareStatement(sql1);
-//                    preparedStatement.setString(1, s1);
-//                    preparedStatement.setString(2, String.valueOf(s2));
-//                    preparedStatement.setString(3, String.valueOf(s3));
-//                    preparedStatement.setString(4, String.valueOf(s4));
-//                    preparedStatement.setInt(5, Integer.parseInt(String.valueOf(s5)));
-//                    preparedStatement.setString(6, String.valueOf(s6));
-////                    Array array = con.createArrayOf("Varchar", copy);
-////                    preparedStatement.setArray(7, array);
-//                    preparedStatement.setString(7, String.valueOf(s8));
-//                    //System.out.println(preparedStatement);
-//                    result = preparedStatement.executeUpdate();
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                }
-
                 try {
                     for (int i = 0; i < copy.length; i++) {
                         PreparedStatement preparedStatement = con.prepareStatement(sql2);
@@ -526,49 +490,17 @@ public class DatabaseManipulation implements DataManipulation {
                     e.printStackTrace();
                 }
 
-//                try {
-//                    PreparedStatement preparedStatement = con.prepareStatement(sql2);
-//                    preparedStatement.setString(1, s1);
-//                    preparedStatement.setString(2, String.valueOf(s2));
-//                    Array array = con.createArrayOf("Varchar", copy);
-//                    preparedStatement.setArray(3, array);
-//                    result = preparedStatement.executeUpdate();
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                }
-
 
                 follow[counter] = copy;
                 followToString[counter] = Arrays.toString(copy);
                 users[counter] = s1;
                 users_name[counter] = String.valueOf(s2);
                 counter++;
-//                try {
-//                    for (String s : copy) {
-//                        filewriter.write(s + " ");
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
             }
             closeConnection();
-
-//             for (int i = 0; i < 37881; i++) {
-//             filewriter.write(users[i] + "\n");
-//             for (int j = 0; j < followToString.length; j++) {
-//             if (followToString[j].contains(users[i])) {
-//             filewriter.write(users[j] + " ");
-//             }
-//             }
-//             filewriter.write("\n");
-//             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-//         finally {
-//            filewriter.flush();
-//            filewriter.close();
-//        }
         long end = System.currentTimeMillis();
         System.out.println("follow插入时间为：" + (end - start));
     }
@@ -723,12 +655,8 @@ public class DatabaseManipulation implements DataManipulation {
                 statement.setInt(7, Integer.parseInt(columnG));
                 statement.setString(8, columnH);
                 statement.setString(9, columnI);
-
-//                statement.executeUpdate();
                 statement.addBatch();
-
                 count++;
-
                 if (count % 100 == 0) {
                     statement.executeBatch();
                     statement.clearBatch();
@@ -774,10 +702,8 @@ public class DatabaseManipulation implements DataManipulation {
         long start = System.currentTimeMillis();
         getConnection();
         String sql = "insert into danmu (BV,user_mid,time,content) values (?,?,?,?);";
-
         try {
             FileInputStream fis = new FileInputStream("src/danmu.csv");
-
             // 检查 BOM
             byte[] bom = new byte[3];
             fis.read(bom);
@@ -788,33 +714,25 @@ public class DatabaseManipulation implements DataManipulation {
                 // 文件不包含 BOM，将文件指针重置到开头
                 fis.reset();
             }
-
             // 创建 InputStreamReader 对象，并指定字符编码
             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
             // 创建 CSVParser 对象
             CSVParser parser = CSVParser.parse(new FileReader("src/danmu.csv"), CSVFormat.DEFAULT.withHeader());
-
             // 创建 PreparedStatement 对象
             PreparedStatement statement = con.prepareStatement(sql);
 //            System.out.println(parser.getRecordNumber());
-
             // 遍历 CSV 记录并插入数据库
             for (CSVRecord record : parser) {
-
                 String columnA = record.get(0);
                 String columnB = record.get(1);
                 String columnC = record.get(2);
                 String columnD = record.get(3);
-
                 statement.setString(1, columnA);
                 statement.setString(2, columnB);
                 statement.setString(3, columnC);
                 statement.setString(4, columnD);
-
-//                statement.executeUpdate();
                 statement.addBatch();
                 count++;
-
                 if (count % 100 == 0) {
                     // 执行批处理操作
                     statement.executeBatch();
@@ -826,7 +744,6 @@ public class DatabaseManipulation implements DataManipulation {
             parser.close();
             isr.close();
             fis.close();
-
             System.out.println("数据插入成功！");
         } catch (Exception e) {
             e.printStackTrace();
@@ -868,22 +785,6 @@ public class DatabaseManipulation implements DataManipulation {
                     System.out.println(Arrays.toString(arr));
                     continue;
                 }
-//                for (int i = 0; i < arr.length; i++) {
-//                    if (arr[i].equals("男") || arr[i].equals("女") || arr[i].equals("保密")) {
-//                        indexOfSex = i;
-//                        break;
-//                    }
-//                }
-//                for (int i = 0; i < arr.length; i++) {
-//                    if (arr[i].contains("{")) {
-//                        index1 = i;
-//                    }
-//                }
-//                for (int i = 0; i < arr.length; i++) {
-//                    if (arr[i].contains("}")) {
-//                        index2 = i;
-//                    }
-//                }
                 //BV
                 String s1 = (arr[0]);
                 //mid
@@ -898,27 +799,12 @@ public class DatabaseManipulation implements DataManipulation {
                     s5.append(arr[i]).append(",");
                 }
                 s5.append(arr[arr.length - 1]);
-//                //following
-//                String[] copy = new String[index2 - index1];
-//                for (int i = index1, j = 0; i < index2; i++, j++) {
-//                    arr[i] = arr[i].replace('{', ' ');
-//                    arr[i] = arr[i].replace('}', ' ');
-//                    arr[i] = arr[i].trim();
-//                    copy[j] = arr[i];
-//                }
-//                //identity
-//                StringBuilder s8 = new StringBuilder().append(arr[arr.length - 1]);
-
                 try {
                     PreparedStatement preparedStatement = con.prepareStatement(sql);
                     preparedStatement.setString(1, String.valueOf(s1));
                     preparedStatement.setString(2, String.valueOf(s2));
                     preparedStatement.setString(3, String.valueOf(s3));
                     preparedStatement.setString(4, String.valueOf(s4));
-//                    preparedStatement.setString(5, String.valueOf(s5));
-//                    Array array = con.createArrayOf("Varchar", copy);
-//                    preparedStatement.setArray(7, array);
-//                    System.out.println(preparedStatement);
                     result = preparedStatement.executeUpdate();
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -926,9 +812,6 @@ public class DatabaseManipulation implements DataManipulation {
 
                 try {
                     filewriter.write(s1 + "\n");
-//                    for (String s : copy) {
-//                        filewriter.write(s + " ");
-//                    }
                     filewriter.write(" \n");
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -946,11 +829,10 @@ public class DatabaseManipulation implements DataManipulation {
     }
 
     public void coinColumn_commonCSV() throws IOException {
-        int count=0;
+        int count = 0;
         long start = System.currentTimeMillis();
         getConnection();
         String sql = "insert into coin (video_BV,user_mid) values (?,?);";
-
         try {
             FileInputStream fis = new FileInputStream("src/videos.csv");
 
@@ -964,15 +846,12 @@ public class DatabaseManipulation implements DataManipulation {
                 // 文件不包含 BOM，将文件指针重置到开头
                 fis.reset();
             }
-
             // 创建 InputStreamReader 对象，并指定字符编码
             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
             // 创建 CSVParser 对象
             CSVParser parser = CSVParser.parse(new FileReader("src/videos.csv"), CSVFormat.DEFAULT.withTrim().withQuote('"').withEscape('\\'));
             // 创建 PreparedStatement 对象
             PreparedStatement statement = con.prepareStatement(sql);
-//            System.out.println(parser.getRecordNumber());
-
             // 遍历 CSV 记录并插入数据库
             for (CSVRecord record : parser) {
 
@@ -984,24 +863,20 @@ public class DatabaseManipulation implements DataManipulation {
                     if (Objects.equals(coin, coins[0])) continue;
                     statement.setString(1, bv);
                     statement.setString(2, coin.replaceAll("'", ""));
-//                    statement.executeUpdate();
                     statement.addBatch();
                     count++;
-
                     if (count % 100 == 0) {
                         // 执行批处理操作
                         statement.executeBatch();
                     }
                 }
-
             }
-statement.executeBatch();
+            statement.executeBatch();
             // 关闭资源
             statement.close();
             parser.close();
             isr.close();
             fis.close();
-
             System.out.println("数据插入成功！");
         } catch (Exception e) {
             e.printStackTrace();
@@ -1011,7 +886,7 @@ statement.executeBatch();
     }
 
     public void addLike() throws IOException {
-        long count=0;
+        long count = 0;
         long start = System.currentTimeMillis();
         getConnection();
         String sql = "insert into thumbs_up (video_BV,user_mid) values (?,?);";
@@ -1049,7 +924,6 @@ statement.executeBatch();
                 for (String like : likes) {
                     statement.setString(1, bv);
                     statement.setString(2, like.replaceAll("'", ""));
-//                    statement.executeUpdate();
                     statement.addBatch();
                     count++;
 
@@ -1111,14 +985,12 @@ statement.executeBatch();
                 String favoriteList = record.get(12);
                 favoriteList = favoriteList.replaceAll("\\[|\\]|\\s", "");
                 String[] favorites = favoriteList.split(",");
-
                 for (String favorite : favorites) {
                     statement.setString(1, bv);
                     statement.setString(2, favorite.replaceAll("'", ""));
 //                    statement.executeUpdate();
                     statement.addBatch();
                     count++;
-
                     if (count % 100 == 0) {
                         // 执行批处理操作
                         statement.executeBatch();
@@ -1148,7 +1020,6 @@ statement.executeBatch();
         int count = 0;
         getConnection();
         String sql = "insert into view (video_BV,user_mid,last_watch_time_duration) values (?,?,?);";
-
         try {
             FileInputStream fis = new FileInputStream("src/videos.csv");
 
@@ -1162,7 +1033,6 @@ statement.executeBatch();
                 // 文件不包含 BOM，将文件指针重置到开头
                 fis.reset();
             }
-
             // 创建 InputStreamReader 对象，并指定字符编码
             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
             // 创建 CSVParser 对象
@@ -1174,24 +1044,20 @@ statement.executeBatch();
 //            parser.iterator().next();
             // 遍历 CSV 记录并插入数据库
             for (CSVRecord record : parser) {
-
                 String bv = record.get(0);
                 String viewData = record.get(13);
-
                 viewData = viewData.replaceAll("\\[|\\]|'", "");
                 Pattern pattern = Pattern.compile("\\((\\d+),\\s*(\\d+)\\)");
                 Matcher matcher = pattern.matcher(viewData);
                 while (matcher.find()) {
                     String userMid = matcher.group(1);
                     String lastWatchTimeDuration = matcher.group(2);
-
                     statement.setString(1, bv);
                     statement.setString(2, userMid);
                     statement.setInt(3, Integer.parseInt(lastWatchTimeDuration));
 //                    statement.executeUpdate();
                     statement.addBatch();
                     count++;
-
                     if (count % 100 == 0) {
                         // 执行批处理操作
                         statement.executeBatch();
@@ -1217,7 +1083,7 @@ statement.executeBatch();
         getConnection();
         long start = System.currentTimeMillis();
         StringBuilder sb = new StringBuilder();
-        String sql = "select count(*) from "+s+";";
+        String sql = "select count(*) from " + s + ";";
         try {
             Statement statement = con.createStatement();
             resultSet = statement.executeQuery(sql);
@@ -1230,14 +1096,15 @@ statement.executeBatch();
             closeConnection();
         }
         long end = System.currentTimeMillis();
-        System.out.println("用时为: " + (end - start)+"ms");
+        System.out.println("用时为: " + (end - start) + "ms");
         return sb.toString();
     }
-    public String allTableOrderByMid(String s1,String s2,String order) {
+
+    public String allTableOrderByMid(String s1, String s2, String order) {
         getConnection();
         long start = System.currentTimeMillis();
         StringBuilder sb = new StringBuilder();
-        String sql = "select "+s1+" from "+s2+" order by "+order+";";
+        String sql = "select " + s1 + " from " + s2 + " order by " + order + ";";
         try {
             Statement statement = con.createStatement();
             resultSet = statement.executeQuery(sql);
@@ -1250,9 +1117,10 @@ statement.executeBatch();
             closeConnection();
         }
         long end = System.currentTimeMillis();
-        System.out.println("用时为: " + (end - start)+"ms");
+        System.out.println("用时为: " + (end - start) + "ms");
         return sb.toString();
     }
+
     public String joinSelect() {
         getConnection(); // start connection
         long start = System.currentTimeMillis();
@@ -1274,7 +1142,7 @@ statement.executeBatch();
                 stringBuilder.append(resultSet.getString("name")).append("\n");
             }
             long end = System.currentTimeMillis();
-            System.out.println("用时为: " + (end - start)+"ms");
+            System.out.println("用时为: " + (end - start) + "ms");
             return stringBuilder.toString();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -1283,6 +1151,7 @@ statement.executeBatch();
         }
         return null;
     }
+
     public void deleteDataFromTable() {
         getConnection();
         long start = System.currentTimeMillis();
@@ -1293,25 +1162,24 @@ statement.executeBatch();
             PreparedStatement statement = con.prepareStatement(deleteQuery);
 
             for (int i = 0; i < deleteCount; i++) {
-                statement.setInt(1, i+1);
+                statement.setInt(1, i + 1);
                 statement.executeUpdate();
             }
             long end = System.currentTimeMillis();
-            System.out.println("删除"+deleteCount+"条数据用时为: " + (end - start)+"ms");
+            System.out.println("删除" + deleteCount + "条数据用时为: " + (end - start) + "ms");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     public void insertDanmu() throws IOException {
         int count = 1;
-        long insertNum=1000000;
+        long insertNum = 20_0000;
         long start = System.currentTimeMillis();
         getConnection();
         String sql = "insert into danmu (danmu_id,BV,user_mid,time,content) values (?,?,?,?,?);";
-
         try {
             FileInputStream fis = new FileInputStream("src/danmu.csv");
-
             // 检查 BOM
             byte[] bom = new byte[3];
             fis.read(bom);
@@ -1322,19 +1190,15 @@ statement.executeBatch();
                 // 文件不包含 BOM，将文件指针重置到开头
                 fis.reset();
             }
-
             // 创建 InputStreamReader 对象，并指定字符编码
             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
             // 创建 CSVParser 对象
             CSVParser parser = CSVParser.parse(new FileReader("src/danmu.csv"), CSVFormat.DEFAULT.withHeader());
-
             // 创建 PreparedStatement 对象
             PreparedStatement statement = con.prepareStatement(sql);
-//            System.out.println(parser.getRecordNumber());
-
             // 遍历 CSV 记录并插入数据库
             for (CSVRecord record : parser) {
-                if(count>insertNum){
+                if (count > insertNum) {
                     break;
                 }
                 String columnA = record.get(0);
@@ -1347,11 +1211,8 @@ statement.executeBatch();
                 statement.setString(3, columnB);
                 statement.setString(4, columnC);
                 statement.setString(5, columnD);
-
-//                statement.executeUpdate();
                 statement.addBatch();
                 count++;
-
                 if (count % 100 == 0) {
                     // 执行批处理操作
                     statement.executeBatch();
@@ -1368,126 +1229,30 @@ statement.executeBatch();
             e.printStackTrace();
         }
         long end = System.currentTimeMillis();
-        System.out.println(insertNum+"条数据插入时间为：" + (end - start));
+        System.out.println(insertNum + "条数据插入时间为：" + (end - start));
     }
-    public void update(){
+
+    public void update() {
         getConnection();
-        long count=0;
-        long start = System.currentTimeMillis();;
-        try  {
+        long count = 0;
+        long start = System.currentTimeMillis();
+        ;
+        try {
             DatabaseMetaData metaData = con.getMetaData();
             ResultSet columns = metaData.getColumns(null, null, "users", null);
-
             while (columns.next()) {
                 String updateQuery = "UPDATE users SET sign = '0' WHERE sign ='';";
-
                 try (PreparedStatement statement = con.prepareStatement(updateQuery)) {
                     statement.executeUpdate();
                     count++;
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         long end = System.currentTimeMillis();
-        System.out.println("update "+count+"条数据时间为：" + (end - start));
-    }
-
-    public String allContinentNames() {
-        getConnection();
-        StringBuilder sb = new StringBuilder();
-        String sql = "select continent from countries group by continent";
-        try {
-            Statement statement = con.createStatement();
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                sb.append(resultSet.getString("continent")).append("\n");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
-
-        return sb.toString();
-    }
-
-    public String continentsWithCountryCount() {
-        getConnection();
-        StringBuilder sb = new StringBuilder();
-        String sql = "select continent, count(*) countryNumber from countries group by continent;";
-        try {
-            Statement statement = con.createStatement();
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                sb.append(resultSet.getString("continent")).append("\t");
-                sb.append(resultSet.getString("countryNumber"));
-                sb.append(System.lineSeparator());
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
-        return sb.toString();
-    }
-
-    public String FullInformationOfMoviesRuntime(int min, int max) {
-        getConnection();
-        StringBuilder sb = new StringBuilder();
-        String sql = "select m.title,c.country_name country,c.continent ,m.runtime " +
-                "from movies m " +
-                "join countries c on m.country=c.country_code " +
-                "where m.runtime between ? and ? order by runtime;";
-        try {
-            PreparedStatement preparedStatement = con.prepareStatement(sql);
-            preparedStatement.setInt(1, min);
-            preparedStatement.setInt(2, max);
-            resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                sb.append(resultSet.getString("runtime")).append("\t");
-                sb.append(String.format("%-18s", resultSet.getString("country")));
-                sb.append(resultSet.getString("continent")).append("\t");
-                sb.append(resultSet.getString("title")).append("\t");
-                sb.append(System.lineSeparator());
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
-        return sb.toString();
-    }
-
-    public String findMovieById(int id) {
-        return null;
-    }
-
-    public String findMoviesByTitleLimited10(String title) {
-        getConnection(); // start connection
-        String sql = "select m.title, c.country_name country, m.runtime,m.year_released\n" +
-                "from movies m join countries c on m.country = c.country_code\n" +
-                "where m.title like '%'||" + title + "||'%'limit 10;";// string combination
-        try {
-            Statement statement = con.createStatement();
-            resultSet = statement.executeQuery(sql);
-            StringBuilder stringBuilder = new StringBuilder(); //combine multi-strings
-            while (resultSet.next()) {
-                stringBuilder.append(String.format("%-20s\t",
-                        resultSet.getString("country")));
-                stringBuilder.append(resultSet.getInt("year_released")).append("\t");
-                stringBuilder.append(resultSet.getInt("runtime")).append("\t");
-                stringBuilder.append(resultSet.getString("title")).append("\n");
-            }
-            return stringBuilder.toString();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } finally {
-            closeConnection(); // close connection
-        }
-        return null;
+        System.out.println("update " + count + "条数据时间为：" + (end - start));
     }
 }
